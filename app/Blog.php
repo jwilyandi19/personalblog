@@ -1,12 +1,13 @@
 <?php
 
 namespace App;
+
 use Illuminate\Database\Eloquent\Model;
 
-class User extends Model
+class Blog extends Model
 {
-    protected $table = 'users';
-    protected $primaryKey='id_user';
+    protected $table = 'blogs';
+    protected $primaryKey='id_blog';
     public $incrementing = true;
     public $timestamps=false;
 
@@ -16,11 +17,10 @@ class User extends Model
      * @var array
      */
     protected $fillable = [
-        'id_user','username','name','password',
+        'id_blog','id_user','title','content',
     ];
 
-    public function blogs() {
-        return $this->hasMany('App\Blog','id_user','id_user');
+    public function user() {
+        return $this->belongsTo('App\User','id_user','id_user');
     }
-
 }

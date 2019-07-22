@@ -11,6 +11,6 @@
 |
 */
 
-Route::get('/', function () {
-    return view('welcome');
-});
+Route::get('/', 'AuthController@home');
+Route::resource('/blog', 'BlogController');
+Route::get('/login','AuthController@login');
