@@ -14,3 +14,5 @@
 Route::get('/', 'AuthController@home');
 Route::resource('/blog', 'BlogController');
 Route::get('/login','AuthController@login');
+Route::post('/login','AuthController@loginAction');
+Route::get('/logout','AuthController@logout');

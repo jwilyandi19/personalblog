@@ -6,7 +6,11 @@
 
 
 @section('content')
-XXX
+
+@if($errors->any())
+    
+@endif
+
 <div id="root">
 </div>
 
