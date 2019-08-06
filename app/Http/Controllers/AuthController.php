@@ -4,15 +4,19 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use App\User;
+use App\Blog;
 use Illuminate\Hashing\BcryptHasher;
 use Illuminate\Support\Facades\Redirect;
+use Session;
 
 class AuthController extends Controller
 {
     /*
         Homepage. Will list all of blogs
     */
-    public function home() {
+
+    public function home() { 
+    
         return view('blogs.index');
     }
 
@@ -41,7 +45,7 @@ class AuthController extends Controller
             $user = User::where('username',$username)->first();
 
             if($user) {
-                $userData = array('username' => $user->username,'name' => $user->name);
+                $userData = array('id_user' => $user->id_user, 'username' => $user->username,'name' => $user->name);
                 $hash = new BcryptHasher();
                 if($hash->check($password,$user->password)) {
                     $request->session()->put('user',$userData);

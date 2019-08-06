@@ -16,7 +16,7 @@ class User extends Model
      * @var array
      */
     protected $fillable = [
-        'id_user','username','name','password',
+        'id_user','username','name','password','created_at','updated_at'
     ];
 
     public function blogs() {

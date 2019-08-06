@@ -3,7 +3,8 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
-
+use App\Blog;
+use Carbon\Carbon;
 class BlogController extends Controller
 {
     /**
@@ -13,7 +14,18 @@ class BlogController extends Controller
      */
     public function index()
     {
-        //
+        $blogs = Blog::with('user')->get();
+
+        foreach($blogs as $blog){
+            $temp = Carbon::parse($blog->created_at);
+            $blog->created = $temp->diffForHumans();
+        }
+
+        $json = response()->json([
+            'blogs' => $blogs,
+        ]);
+        return $json;
+
     }
 
     /**
@@ -32,9 +44,29 @@ class BlogController extends Controller
      * @param  \Illuminate\Http\Request  $request
      * @return \Illuminate\Http\Response
      */
-    public function store(Request $request)
+    public function store(Request $request, Blog $blog)
     {
-        //
+        $this->validate($request, [
+            'title' => 'required',
+            'content' => 'required',
+        ]);
+
+        $blog->title = $request->title;
+        $blog->content = $request->content;
+        $blog->id_user = session('user')['id_user'];
+        $blog->save();
+        $blogs = Blog::with('user')->get();
+
+        foreach($blogs as $blogz){
+            $temp = Carbon::parse($blogz->created_at);
+            $blogz->created = $temp->diffForHumans();
+        }
+
+        $json = response()->json([
+            'blogs' => $blogs,
+        ]);
+
+        return $json;
     }
 
     /**

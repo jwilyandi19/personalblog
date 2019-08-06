@@ -31,13 +31,6 @@
                     </div>
                 </div>
             </div>
-            <div class="col-md-3">
-                <div class="form-control-feedback">
-                    <span class="text-danger align-middle">
-                        Example error message
-                    </span>
-                </div>
-            </div>
         </div>
         <div class="row">
             <div class="col-md-9">
@@ -47,13 +40,6 @@
                         <input type="password" name="password" class="form-control" id="password"
                                 required autofocus>
                     </div>
-                </div>
-            </div>
-            <div class="col-md-3">
-                <div class="form-control-feedback">
-                    <span class="text-danger align-middle">
-                        Example error message
-                    </span>
                 </div>
             </div>
         </div>
