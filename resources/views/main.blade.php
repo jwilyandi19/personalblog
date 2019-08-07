@@ -6,23 +6,14 @@
     <link rel="stylesheet" type="text/css" href="{{asset('css/custom.css')}}">
     <link rel="stylesheet" type="text/css" href="{{asset('css/bootstrap.min.css')}}">
     <title>JasonBlog</title>
-    @yield('style')
 </head>
 
 <body>
-    @if(session('user'))
-        @include('layouts.headerin')
-    @else 
-        @include('layouts.headerout')
-    @endif
-        <div class="container" style="margin-top:80px">
-            @yield('content')
-        </div>
-    
-    @include('layouts.footer')
+    <div id="root">
+        
+    </div>
     
 <script src="{{mix('js/app.js')}}"></script>
 <script src="{{asset('js/bootstrap.min.js')}}"></script>
-@yield('script')
 </body>
 

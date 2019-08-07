@@ -4,6 +4,8 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use App\User;
+use JWTAuth;
+use JWTAuthException;
 use App\Blog;
 use Illuminate\Hashing\BcryptHasher;
 use Illuminate\Support\Facades\Redirect;
@@ -15,62 +17,92 @@ class AuthController extends Controller
         Homepage. Will list all of blogs
     */
 
-    public function home() { 
-    
-        return view('blogs.index');
-    }
-
-    /*
-        Login page
-    */
-    public function login() {
-
-        if(!session('user')) {
-            return view('auth.login');
+    private function getToken($username, $password) {
+        $token = null;
+        try {
+            if(!$token = JWTAuth::attempt(['username'=>$username, 'password'=>$password])) {
+                return response()->json([
+                    'response' => 'error',
+                    'message' => 'Username/password tidak valid',
+                    'token' => $token,
+                ]);
+            }
+        } catch (JWTAuthException $e) {
+            return response()->json([
+                'response' => 'error',
+                'message' => 'Gagal membuat token',
+            ]);
         }
-        else {
-            return Redirect::to('/');
-        }
+        return $token;
     }
-    
 
     /*
         Post Request of Login
      */
-    public function loginAction(Request $request) {
-        if($request->has(['username','password'])) {
-
-            $username = $request->username;
-            $password = $request->password;
-            $user = User::where('username',$username)->first();
-
-            if($user) {
-                $userData = array('id_user' => $user->id_user, 'username' => $user->username,'name' => $user->name);
-                $hash = new BcryptHasher();
-                if($hash->check($password,$user->password)) {
-                    $request->session()->put('user',$userData);
-                    return Redirect::to('/');
-                }
-                else {
-                    return Redirect::to('/login')->withErrors('Terjadi kesalahan saat login. Pastikan Anda mengecek kembali username dan password Anda.');
-                }
-            }
-            else {
-                return Redirect::to('/login')->withErrors('Terjadi kesalahan saat login. Pastikan Anda mengecek kembali username dan password Anda.');
-            }
+    public function login(Request $request) {
+        $user = User::where('username',$request->username)->first();
+        $checkedHash = \Hash::check($request->password, $user->password);
+        if($user && $checkedHash) {
+            $token = self::getToken($request->username,$request->password);
+            $user->save();
+            $response = [
+                'success' => true,
+                'data' => [
+                    'id_user' => $user->id_user,
+                    'token_auth' => $token,
+                    'name' => $user->name,
+                    'username' => $user->username,
+                ],
+            ];
         }
+        else {
+            $response = [
+                'success' => false,
+                'data' => 'Data user tidak ditemukan',
+            ];
+        }
+
+        return response()->json($response, 201);
     }
 
     /*
-        LogOut
+        Register
     */
-    public function logout(Request $request) {
-        if(!session('user')) {
-            return Redirect::to('/')->withErrors('Halaman tidak ditemukan');
-        }
-        else {
-            $request->session()->flush();
-            return Redirect::to('/');
-        }
+    public function register(Request $request) {
+        $userData = [
+            'password' => bcrypt($request->password),
+            'username' => $request->username,
+            'name' => $request->name,
+            'token_auth' => '',
+        ];
+        $user = new User($userData);
+        if($user->save()) {
+            $token = self::getToken($request->username,$request->password);
+            if(!is_string($token)) {
+                return response()->json([
+                    'success' => false,
+                    'data' => 'Gagal membuat token',
+                ], 201);
+            }
+            $user = User::where('username',$request->username)->first();
+            $user->save();
+            $response = [
+                'success' => true,
+                'data' => [
+                    'id_user' => $user->id_user,
+                    'token_auth' => $token,
+                    'name' => $user->name,
+                    'username' => $user->username,
+                ],
+            ];
+         }
+         else {
+             $response = [
+                 'success' => false,
+                 'data' => 'Gagal membuat user',
+             ];
+         }
+         return response()->json($response, 201);
+
     }
 }
